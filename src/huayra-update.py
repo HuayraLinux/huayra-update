@@ -5,25 +5,17 @@ import wx
 import os.path
 from dbus.mainloop.glib import DBusGMainLoop
 
-from lib.networking import NetworkStatus
 from lib.about import AboutDialog
+from lib.networking import NetworkStatus
 
 
-class HuayraUpdate(wx.App):
-    def OnInit(self):
-        self.current_path = os.path.dirname(os.path.realpath(__file__))
+class HuayraUpdateIcon(wx.TaskBarIcon):
+    def __init__(self, frame):
+        super(HuayraUpdateIcon, self).__init__()
+        self.frame = frame
 
-        DBusGMainLoop(set_as_default=True)
-        a = NetworkStatus()
-
-        return True
-
-
-class TaskBarIcon(wx.TaskBarIcon):
-    def __init__(self):
-        super(TaskBarIcon, self).__init__()
         self.icon = wx.IconFromBitmap(wx.Bitmap(os.path.join(
-            wx.GetApp().current_path,
+            wx.GetApp().app_path,
             'media',
             'huayra-update.png'
         )))
@@ -34,7 +26,7 @@ class TaskBarIcon(wx.TaskBarIcon):
     def change_tooltip(self, text):
         self.SetIcon(self.icon, text)
 
-    def CreatePopupMenu(self):
+    def CreatePopupMenu(self, evt=None):
         menu = wx.Menu()
         btn_update = menu.Append(id=-1, text=u'Actualizar Huayra')
         btn_about = menu.Append(id=-1, text='Acerca de')
@@ -47,19 +39,48 @@ class TaskBarIcon(wx.TaskBarIcon):
 
         return menu
 
-    def OnUpdate(self, event):
+    def OnUpdate(self, evt):
         print 'actualizar'
 
-    def OnAbout(self, event):
-        about_screen = AboutDialog()
+    def OnAbout(self, evt):
+        about_screen = AboutDialog(self.frame)
         about_screen.Show()
 
-    def OnExit(self, event):
-        wx.CallAfter(self.Destroy)
+    def OnExit(self, evt):
+        self.frame.Close()
 
+
+class MainFrame(wx.Frame):
+    def __init__(self):
+        super(MainFrame, self).__init__(
+            parent=None,
+            id=-1,
+            title=u'Huayra Update',
+        )
+
+        self.tray_icon = HuayraUpdateIcon(self)
+
+        self.Bind(wx.EVT_CLOSE, self.OnClose)
+
+    def OnClose(self, evt):
+        self.tray_icon.RemoveIcon()
+        self.tray_icon.Destroy()
+        self.Destroy()
+
+
+class HuayraUpdate(wx.App):
+    def __init__(self):
+        self.app_path = os.path.dirname(os.path.realpath(__file__))
+        super(HuayraUpdate, self).__init__(redirect=False)
+
+    def OnInit(self):
+        DBusGMainLoop(set_as_default=True)
+        a = NetworkStatus()
+
+        return True
 
 
 if __name__ == '__main__':
     app = HuayraUpdate()
-    TaskBarIcon()
+    frame = MainFrame()
     app.MainLoop()
