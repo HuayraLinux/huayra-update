@@ -22,6 +22,8 @@ class NetworkStatus(object):
         self._bus = dbus.SystemBus()
         self._current_status = 40
 
+        self.proxy = kwargs['proxy']
+
         self._initial_status()
         self._bind_status()
 
@@ -41,10 +43,10 @@ class NetworkStatus(object):
             print 'Conectando/Desconectando, no hago nada.'
 
         elif new_status < self._current_status:
-            print 'Se pierde la conexión: Apagar servicio.'
+            self.proxy.on_disconnect()
 
         elif new_status > self._current_status:
-            print 'Se reanuda la conexión: Encender servicio.'
+            self.proxy.on_connect()
 
         self._current_status = new_status
 
