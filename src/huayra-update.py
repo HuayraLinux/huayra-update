@@ -4,9 +4,37 @@
 import wx
 import os.path
 from dbus.mainloop.glib import DBusGMainLoop
+import subprocess
+import threading
 
 from lib.about import AboutDialog
 from lib.networking import NetworkStatus
+
+
+def popenAndCall(onExit, popenArgs):
+    """
+    Runs the given args in a subprocess.Popen, and then calls the function
+    onExit when the subprocess completes.
+    onExit is a callable object, and popenArgs is a list/tuple of args that
+    would give to subprocess.Popen.
+    """
+    def runInThread(onExit, popenArgs):
+        proc = subprocess.Popen(*popenArgs)
+        proc.wait()
+        onExit()
+        return
+    thread = threading.Thread(target=runInThread, args=(onExit, popenArgs))
+    thread.start()
+    # returns immediately after the thread starts
+    return thread
+
+
+class test(object):
+    def on_connect(self):
+        print 'me conecté'
+
+    def on_disconnect(self):
+        print 'me desconecté'
 
 
 class HuayraUpdateIcon(wx.TaskBarIcon):
@@ -21,7 +49,7 @@ class HuayraUpdateIcon(wx.TaskBarIcon):
         )))
         self.change_tooltip(u'Hay actualizaciones de Huayra disponibles.')
 
-        self.Bind(wx.EVT_TASKBAR_LEFT_DCLICK, self.OnUpdate)
+        self.Bind(wx.EVT_TASKBAR_LEFT_DOWN, self.OnUpdate)
 
     def change_tooltip(self, text):
         self.SetIcon(self.icon, text)
@@ -40,7 +68,13 @@ class HuayraUpdateIcon(wx.TaskBarIcon):
         return menu
 
     def OnUpdate(self, evt):
-        print 'actualizar'
+        if self.frame._is_updating == False:
+            self.frame._is_updating = True
+
+            popenAndCall(self.frame._proc_done, ['gpk-update-viewer'])
+
+        else:
+            'ah ah ah, no digiste la palabra mágica'
 
     def OnAbout(self, evt):
         about_screen = AboutDialog(self.frame)
@@ -58,11 +92,20 @@ class MainFrame(wx.Frame):
             title=u'Huayra Update',
         )
 
+        self._is_updating = False
+        self._proc = None
+
         self.tray_icon = HuayraUpdateIcon(self)
 
         self.Bind(wx.EVT_CLOSE, self.OnClose)
 
+    def _proc_done(self):
+        self._is_updating = False
+
     def OnClose(self, evt):
+        if self._is_updating:
+            return None
+
         self.tray_icon.RemoveIcon()
         self.tray_icon.Destroy()
         self.Destroy()
@@ -74,8 +117,10 @@ class HuayraUpdate(wx.App):
         super(HuayraUpdate, self).__init__(redirect=False)
 
     def OnInit(self):
+        proxy_test = test()
+
         DBusGMainLoop(set_as_default=True)
-        a = NetworkStatus()
+        a = NetworkStatus(proxy=proxy_test)
 
         return True
 
