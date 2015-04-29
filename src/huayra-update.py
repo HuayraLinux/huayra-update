@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import wx
+from wx.lib.pubsub import pub
 import os.path
 from dbus.mainloop.glib import DBusGMainLoop
 import subprocess
@@ -31,10 +32,18 @@ def popenAndCall(onExit, popenArgs):
 
 class test(object):
     def on_connect(self):
-        print 'me conecté'
+        wx.CallAfter(
+            pub.sendMessage,
+            'network-connected',
+            val=True
+        )
 
     def on_disconnect(self):
-        print 'me desconecté'
+        wx.CallAfter(
+            pub.sendMessage,
+            'network-connected',
+            val=False
+        )
 
 
 class HuayraUpdateIcon(wx.TaskBarIcon):
@@ -99,8 +108,13 @@ class MainFrame(wx.Frame):
 
         self.Bind(wx.EVT_CLOSE, self.OnClose)
 
+        pub.subscribe(self.LaunchPK, 'network-connected')
+
     def _proc_done(self):
         self._is_updating = False
+
+    def LaunchPK(self, val):
+        print 'A LA FLAUTA:', type(val), val
 
     def OnClose(self, evt):
         if self._is_updating:
