@@ -10,6 +10,7 @@ import threading
 
 from lib.about import AboutDialog
 from lib.networking import NetworkStatus
+from lib.pk import APTCache
 
 
 def popenAndCall(onExit, popenArgs):
@@ -31,19 +32,26 @@ def popenAndCall(onExit, popenArgs):
 
 
 class test(object):
+    def __init__(self, *args, **kwargs):
+        self._is_connected = False
+
     def on_connect(self):
-        wx.CallAfter(
-            pub.sendMessage,
-            'network-connected',
-            val=True
-        )
+        if self._is_connected == False:
+            self._is_connected = True
+            wx.CallAfter(
+                pub.sendMessage,
+                'network-connected',
+                val=True
+            )
 
     def on_disconnect(self):
-        wx.CallAfter(
-            pub.sendMessage,
-            'network-connected',
-            val=False
-        )
+        if self._is_connected == True:
+            self._is_connected = False
+            wx.CallAfter(
+                pub.sendMessage,
+                'network-connected',
+                val=False
+            )
 
 
 class HuayraUpdateIcon(wx.TaskBarIcon):
@@ -62,6 +70,11 @@ class HuayraUpdateIcon(wx.TaskBarIcon):
 
     def change_tooltip(self, text):
         self.SetIcon(self.icon, text)
+
+    def remove_taskbar(self):
+        self.RemoveIcon()
+        self.Destroy()
+
 
     def CreatePopupMenu(self, evt=None):
         menu = wx.Menu()
@@ -104,8 +117,6 @@ class MainFrame(wx.Frame):
         self._is_updating = False
         self._proc = None
 
-        self.tray_icon = HuayraUpdateIcon(self)
-
         self.Bind(wx.EVT_CLOSE, self.OnClose)
 
         pub.subscribe(self.LaunchPK, 'network-connected')
@@ -114,14 +125,28 @@ class MainFrame(wx.Frame):
         self._is_updating = False
 
     def LaunchPK(self, val):
-        print 'A LA FLAUTA:', type(val), val
+        if val:
+            self._cache = APTCache()
+
+            if self._cache.updateable:
+                self.tray_icon = HuayraUpdateIcon(self)
+
+        else:
+            try:
+                self.tray_icon.remove_taskbar()
+            except:
+                pass
+
 
     def OnClose(self, evt):
         if self._is_updating:
             return None
 
-        self.tray_icon.RemoveIcon()
-        self.tray_icon.Destroy()
+        try:
+            self.tray_icon.remove_taskbar()
+        except:
+            pass
+
         self.Destroy()
 
 
