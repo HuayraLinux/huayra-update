@@ -1,0 +1,16 @@
+Source: huayra-update
+Section: net
+Priority: extra
+Maintainer: Ignacio Juan Martín Benedetti <tranceway@gmail.com>
+Build-Depends: debhelper (>= 8.0.0), python-support (>= 0.90)
+Standards-Version: 3.9.5
+Homepage: http://github.com/HuayraLinux/huayra-update
+Vcs-Git: git://github.com/HuayraLinux/huayra-update.git
+Vcs-Browser: https://github.com/HuayraLinux/huayra-update
+Package: huayra-update
+Architecture: all
+Depends: ${shlibs:Depends}, ${misc:Depends}, python-support (>= 0.90), python, python-wxgtk3.0
+Provides: huayra-update
+Conflicts: huayra-update
+Replaces: huayra-update
+Description: Actualiza el sistema Huayra Linux
