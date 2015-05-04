@@ -1,0 +1,11 @@
+[Desktop Entry]
+Version=1.0
+Name=Huayra Update
+GenericName=Huayra Update
+Comment=Actualizador de paquetes de Huayra
+Exec=/usr/bin/huayra-update
+Icon=huayra-update
+Terminal=false
+Type=Application
+Categories=Huayra;System;Utility
+Keywords=Actualizar

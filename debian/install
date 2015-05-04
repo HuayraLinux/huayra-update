@@ -1,1 +1,4 @@
-src/ usr/share/huayra-update/
+src/* usr/share/huayra-update/
+src/media/huayra-update.svg usr/share/icons/hicolor/scalable/apps/
+debian/huayra-update.desktop usr/share/applications
+debian/huayra-update.desktop etc/xdg/autostart
