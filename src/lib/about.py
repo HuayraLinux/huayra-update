@@ -30,5 +30,11 @@ class AboutDialog(wx.Frame):
         self.SetMinSize((350, 250))
         self.SetMaxSize((350, 250))
 
+        w, h = wx.DisplaySize()
+        x = (w / 2) - (350 / 2)
+        y = (h / 2) - (250 / 2)
+
+        self.SetPosition((x,y))
+
     def OnClose(self, evt):
         self.Close()
