@@ -5,7 +5,7 @@ import os.path
 
 TITLE_TXT = """Huayra Update"""
 ABOUT_TXT = """Te avisa cuando hay actualizaciones del sistema disponibles."""
-VERSION_TXT = """Versión: {{VERSION}}"""
+VERSION_TXT = """Versión: 0.3"""
 
 class AboutDialog(wx.Frame):
     def __init__(self, parent=None):
