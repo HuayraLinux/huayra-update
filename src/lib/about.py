@@ -5,7 +5,7 @@ import os.path
 
 TITLE_TXT = """Huayra Update"""
 ABOUT_TXT = """Te avisa cuando hay actualizaciones del sistema disponibles."""
-VERSION_TXT = """Versión: 0.3"""
+VERSION_TXT = """Versión: 0.4"""
 
 class AboutDialog(wx.Frame):
     def __init__(self, parent=None):
@@ -34,6 +34,10 @@ class AboutDialog(wx.Frame):
         txt2 = wx.StaticText(panel, id=-1, label=VERSION_TXT, pos=(115, 120))
         txt2.Wrap(200)
         txt2.SetFont(font)
+
+        txt.SetForegroundColour((0,0,0))
+        txt1.SetForegroundColour((0,0,0))
+        txt2.SetForegroundColour((0,0,0))
 
 
         self.SetMinSize((350, 250))

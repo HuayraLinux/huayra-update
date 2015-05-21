@@ -1,3 +1,9 @@
+huayra-update (0.4) unstable; urgency=medium
+
+  * Cambio del color de texto.
+
+ -- Ignacio Juan Martín Benedetti <tranceway@gmail.com>  Thu, 21 May 2015 15:58:35 -0300
+
 huayra-update (0.3) unstable; urgency=medium
 
   * Nuevo cuadro "Acerca de".
