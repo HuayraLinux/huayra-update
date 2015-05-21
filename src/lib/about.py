@@ -1,16 +1,11 @@
 # -*- coding: utf-8 -*-
 
 import wx
-import wx.html
 import os.path
 
-import webbrowser
-
-
-class wxHTML(wx.html.HtmlWindow):
-    def OnLinkClicked(self, link):
-        webbrowser.open(link.GetHref())
-
+TITLE_TXT = """Huayra Update"""
+ABOUT_TXT = """Te avisa cuando hay actualizaciones del sistema disponibles."""
+VERSION_TXT = """Versión: {{VERSION}}"""
 
 class AboutDialog(wx.Frame):
     def __init__(self, parent=None):
@@ -19,13 +14,27 @@ class AboutDialog(wx.Frame):
             title=u'Acerca de',
         )
 
-        html = wxHTML(self)
-        html.LoadPage(
-            os.path.join(
-            wx.GetApp().app_path,
-            'media',
-            'about.html'
-        ))
+        img = os.path.join(wx.GetApp().app_path, 'media', 'fondo.png')
+        bmp = wx.Image(img, wx.BITMAP_TYPE_ANY).ConvertToBitmap()
+
+        panel = wx.Panel(self)
+        wx.StaticBitmap(panel, -1, bmp, (0, 0))
+
+        font = wx.Font(12, wx.MODERN, wx.NORMAL, wx.NORMAL, False, u'Asap')
+
+        txt = wx.StaticText(panel, id=-1, label=TITLE_TXT, pos=(115, 40))
+        txt.SetFont(
+            wx.Font(12, wx.MODERN, wx.NORMAL, wx.BOLD, False, u'Asap')
+        )
+
+        txt1 = wx.StaticText(panel, id=-1, label=ABOUT_TXT, pos=(115, 58))
+        txt1.Wrap(200)
+        txt1.SetFont(font)
+
+        txt2 = wx.StaticText(panel, id=-1, label=VERSION_TXT, pos=(115, 120))
+        txt2.Wrap(200)
+        txt2.SetFont(font)
+
 
         self.SetMinSize((350, 250))
         self.SetMaxSize((350, 250))
