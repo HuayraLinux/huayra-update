@@ -123,7 +123,6 @@ class MainFrame(wx.Frame):
 
     def _proc_done(self):
         self._is_updating = False
-        self.LaunchPK(1)
 
     def LaunchPK(self, val):
         if val:
@@ -131,12 +130,6 @@ class MainFrame(wx.Frame):
 
             if self._cache.updateable:
                 self.tray_icon = HuayraUpdateIcon(self)
-
-            else:
-                try:
-                    self.tray_icon.remove_taskbar()
-                except:
-                    pass
 
         else:
             try:
